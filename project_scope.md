@@ -910,7 +910,7 @@ stateDiagram-v2
     Material --> Finishes
     Finishes --> ReviewPair
     ReviewPair --> Cart: add to cart
-    Cart --> FrameType: edit pair
+    Cart --> Purpose: edit pair
     Cart --> Address: checkout
     Address --> Ship
     Ship --> Pay
@@ -929,6 +929,7 @@ stateDiagram-v2
     - Each prism needs a base direction.
 - **Measurement at MVP:** the camera option is hidden, so multifocal pairs go straight to the opt-out notice. The acknowledgement is stored as `measurement_ack_at` and shown read-only on Order Review.
 - **Order review:** "Place order" is disabled until the terms box is checked. It stays disabled, with a spinner, while payment runs. The server rejects completion if any multifocal pair lacks an acknowledgement.
+- **Editing a pair from the cart** reopens the wizard at Purpose, not at Frame type. The frame and frame type stay as chosen. To change those, remove the pair and start again from the product page.
 - **Wizard state** (frame type, purpose, Rx draft, measurement, lens selection) is saved to `sessionStorage` under the frame's variant ID and cleared once the pair is in the cart.
 
 ### 25.2 Lab job statuses
@@ -995,7 +996,7 @@ stateDiagram-v2
     2. Checks that each option fits the frame type, for example no flash mirror on sunglasses.
     3. Adds the frame line (quantity 1) and the lens line (custom unit price) in one step.
     4. If any part fails, neither line is added.
-- Pair lines are quantity 1 and can't be changed in the cart. "Edit" reopens the wizard with the pair's saved choices and replaces the pair.
+- Pair lines are quantity 1 and can't be changed in the cart. "Edit" reopens the wizard at the Purpose step with the pair's saved choices, then replaces the pair.
 
 ### 26.2 Sales tax provider
 
