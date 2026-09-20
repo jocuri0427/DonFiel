@@ -1,6 +1,6 @@
 # DonFiel Project Scope
 
-_Last updated: 2026-09-18 · Covers the MVP and v1 · Part 1: product requirements · Part 2: technical design_
+_Last updated: 2026-09-19 · Covers the MVP and v1 · Part 1: product requirements · Part 2: technical design_
 
 This file combines the project's requirement sources into one reference:
 
@@ -68,7 +68,7 @@ DonFiel is an online eyewear store with an optician's dashboard. It:
 | Release | Target | Contents |
 | --- | --- | --- |
 | MVP | Monday, November 16, 2026 | Everything needed to sell prescription glasses (build steps 1–6) |
-| v1 | End of 2026 | Camera measurement step, self-service returns and warranty portal, admin security polish (build steps 7–8) |
+| v1 | End of 2026 | Camera measurement step, self-service returns and warranty portal, admin security polish, a practice site (build steps 7–8) |
 
 **Build order:** 1. Catalog → 2. Cart → 3. Non-Rx checkout with live payments → 4. Rx checkout → 5. Accounts and saved prescriptions → 6. Tablet admin → 7. Camera step → 8. Returns and warranty portal.
 
@@ -82,7 +82,7 @@ Each requirement below is tagged **[MVP]** or **[v1]**.
 
 **Not in this document's scope:**
 
-- **v2** (end of 2026 or January 2027): account closure requests handled by staff; launching the admin from a tablet home-screen icon; a separate practice site with sample orders; an upload link for missing Rx information
+- **v2** (end of 2026 or January 2027): account closure requests handled by staff; launching the admin from a tablet home-screen icon; an upload link for missing Rx information
 - **Backlog:** automatic prescription reading (OCR); 3D face measurement; live camera try-on for browsing; automatic seg height calculation; hiding frames too short for progressive lenses; made-to-measure frames; syncing stock with the frame supplier; shipping priced by package size; international shipping
 - **Decided against:** rush processing; checking whether a prescription is still valid; holding refund money in escrow; a self-service "delete my account" button
 
@@ -100,6 +100,14 @@ Five styles, named with Portuguese numbers, in 20 colors.
 | Quatro | Frosted Matte Clear, Dark Turquoise, Black, Frosted Yellow, Frosted Orange, Frosted Red, Frosted Pink, Frosted Blue | 8 |
 | Cinco | Frosted Matte Clear, Black, Frosted Yellow, Frosted Orange, Frosted Red, Frosted Pink, Frosted Blue | 7 |
 
+**Frame prices** (the frame alone; lenses are priced separately):
+
+| Style | Regular price | Discounted price |
+| --- | --- | --- |
+| Um | $260 | $120 |
+| Dois, Três, Quatro, Cinco | $220 | $100 |
+
+- Customers pay the discounted price. The regular price is shown crossed out next to it.
 - Every frame can be bought as eyeglasses or sunglasses.
 - The five colors made from the frosted matte clear are named "Frosted <color>" (handles such as `frosted_yellow`), so they aren't confused with the Tinted lens finish.
 - Only frames are stock. Each order takes one frame out of inventory. Lenses are made per order in our lab.
@@ -127,46 +135,61 @@ Five styles, named with Portuguese numbers, in 20 colors.
 3. **Prescription:** pick a saved prescription, type one in, or upload a photo or PDF. Customers are encouraged to upload an Rx that shows a license number.
 4. **Confirm prescription:** review the values entered, with a way back to edit them.
 5. **Measurement [v1]:** the optional camera step (section 9). At MVP, progressive and bifocal orders go straight to manual estimation.
-6. **Lens material:** required choice of material.
+6. **Lens material:** required choice of material for prescription lenses. Non-prescription pairs get a $0 stock lens and skip this step.
 7. **Finishes and coatings:** optional add-ons.
 8. **Order review:** every choice made; the measurement acknowledgement where it applies; shipping details; card payment; the required terms checkbox; "Place order".
 
 **Branches:**
 
-- Non-prescription orders skip steps 3–5.
+- Non-prescription orders skip steps 3–6.
 - Frame-only orders skip steps 3–7 and ship straight from stock.
 
 ### Lens materials
 
-Required on every order with lenses. The same four options apply to eyeglasses and sunglasses.
+Required on every prescription order. The same four options apply to eyeglasses and sunglasses, and the price depends on the lens type.
 
-| Material | Description |
-| --- | --- |
-| CR-39 | Plastic, entry level. The most affordable; good for low prescriptions |
-| Polycarbonate | Thinner than CR-39 and highly durable. The usual choice for higher prescriptions, where CR-39 gets thick |
-| High Index | Thinner than Polycarbonate |
-| Tryvex | About twice as durable as Polycarbonate |
+| Material | Description | Single vision / readers | Bifocal / progressive |
+| --- | --- | --- | --- |
+| CR-39 | Plastic, entry level. The most affordable; good for low prescriptions | +$20 | +$80 |
+| Polycarbonate | Thinner than CR-39 and highly durable. The usual choice for higher prescriptions, where CR-39 gets thick | +$35 | +$110 |
+| High Index | Thinner than Polycarbonate | +$45 | +$150 |
+| Tryvex | About twice as durable as Polycarbonate | +$55 | +$180 |
+
+**Non-prescription lenses** are stock lenses at $0, with no material choice. The customer pays only for the finish and coatings they pick.
 
 ### Finishes (optional; depend on frame type)
 
-| Frame type | Finish | Sub-options |
-| --- | --- | --- |
-| Eyeglasses | Clear | None |
-| Eyeglasses | Transition | Grey or brown |
-| Sunglasses | Tinted | Gradient or solid; density 1, 2 or 3 |
-| Sunglasses | Polarized | Brown, gray, or G15 (green) |
+| Frame type | Finish | Price | Sub-options |
+| --- | --- | --- | --- |
+| Eyeglasses | Clear | +$0 | None |
+| Eyeglasses | Transition | +$60 | Grey or brown |
+| Sunglasses | Gradient tint | +$30 | 8 tint colors |
+| Sunglasses | Solid tint | +$20 | 8 tint colors |
+| Sunglasses | Polarized | +$80 | Brown, gray, or G15 (green) |
+
+**Tint colors** (same for gradient and solid): Grey, Brown, Green, Red, Pink, Yellow, Orange, Purple.
+
+_To confirm: whether tint density (1, 2 or 3) is still offered._
 
 ### Coatings (optional)
 
-- Anti-reflective
-- Premium blue light filter anti-glare
-- Mirror: solid mirror (colorful) for sunglasses only; flash mirror for eyeglasses only
+| Coating | Price | Fits |
+| --- | --- | --- |
+| Anti-reflective | +$50 | Eyeglasses and sunglasses |
+| Premium blue light filter anti-glare | +$80 | Eyeglasses and sunglasses |
+| Solid mirror | +$60 | Sunglasses only |
+| Flash mirror | +$50 | Eyeglasses only |
+
+**Mirror colors** (same for solid and flash): Blue, Green, Silver, Black, Cobalt, Gold (+$20 extra), Orange, Red, Pink.
+
+_To confirm: which coatings can be combined, for example anti-reflective together with the blue light filter, or a mirror with anti-reflective._
 
 ### Pricing
 
 - The lens is priced separately from the frame and appears as its own line.
-- Material, finishes and coatings add to the lens price and feed the cart total.
-- Open: whether lens prices are flat or change with prescription strength (section 20).
+- Prescription lens price = material (by lens type) + finish + each coating + $20 if the mirror color is Gold. Prices are flat add-ons and don't change with prescription strength.
+- Non-prescription lens price = $0 stock lens + finish + each coating (+ $20 for Gold).
+- Example: progressive, Polycarbonate, Transition, anti-reflective = $110 + $60 + $50 = $220 for the lens, plus the frame.
 
 ---
 
@@ -189,7 +212,7 @@ One eye can have both a horizontal and a vertical prism (for example, 1 base up 
 
 ### Saving and reusing
 
-- **[MVP]** Every Rx order keeps its own copy of the prescription, and of any uploaded file, on that pair's line. One order can hold two pairs with different prescriptions. For guests, this is the only copy.
+- **[MVP]** Every Rx order keeps its own copy of the prescription, and of any uploaded file, on that pair's line. An order can hold several pairs, and each pair keeps its own prescription (for example, a distance pair and a pair of readers in one checkout). For guests, this is the only copy.
 - **[MVP]** Account holders can save multiple prescriptions, name them, update them when their prescription changes, and pick one at checkout.
 - **[MVP]** A prescription typed in at checkout can be saved to the customer's account.
 - **[MVP]** The prescription picked at checkout is copied onto the order. Editing a saved prescription later never changes a past order.
@@ -313,6 +336,7 @@ If sales into another state pass that state's threshold, the client will need to
 - **[MVP]** An order queue with these statuses: New → Lenses In Lab → Lenses Verified → Edging & Assembly → Ready to Ship → Shipped, plus On Hold – Action Required.
 - **[MVP]** A way to put an order On Hold. This sends an automated email asking the customer for the missing or illegible information. The customer replies by email, and payment stays captured while the order waits.
 - **[MVP]** A queue of orders flagged for manual seg height estimation, with a seg height entry field.
+- **[MVP]** The tablet app works and is optimized on phone, tablet and desktop.
 - **[MVP]** An Rx view with large, readable values and large touch targets, usable on a tablet beside the lab equipment.
 - **[MVP]** A tracking number entry when an order ships.
 - **[MVP]** A refund button.
@@ -322,6 +346,7 @@ If sales into another state pass that state's threshold, the client will need to
 - **[v1]** A "Continue working" warning before automatic logout.
 - **[v1]** A warning before leaving a page with unsaved changes.
 - **[v1]** Warranty claims and return approvals handled in the dashboard.
+- **[v1]** A separate practice site with sample orders, so the optician can rehearse without touching live orders or payments.
 
 ---
 
@@ -377,9 +402,9 @@ If sales into another state pass that state's threshold, the client will need to
 
 | Item | Needed by | Why |
 | --- | --- | --- |
-| Lens pricing structure: flat add-on prices, or prices that change with prescription strength | Oct 2, 2026 | Decides how the cart calculates lens prices |
 | Domain (for example donfiel.com) | Oct 9, 2026 | Payment account review, order emails and site security all need it |
-| Full price list: frames, each material, each finish and sub-option, each coating, standard and expedited shipping | Oct 30, 2026 | End-to-end testing needs real totals |
+| Standard and expedited shipping prices | Oct 30, 2026 | End-to-end testing needs real totals |
+| Price list details: whether tint density (1, 2, 3) is still offered, and which coatings can be combined | Oct 2, 2026 | Needed before the cart and lens steps are built |
 | Stock count and photos for each of the 20 colors (Cinco has no photos yet) | Nov 2, 2026 | Loading the real catalog |
 
 ---
@@ -416,6 +441,7 @@ _Covers the MVP and v1, like Part 1. Section numbers continue from Part 1._
 | Tablet admin | Separate Next.js app | Hosted on Vercel. Talks to Medusa's admin API |
 | Desktop admin | Medusa Admin (built in) | Served by the Medusa server at `/app` |
 | Payments | Stripe, through Medusa's official Stripe payment provider | Card form is Stripe Elements |
+| Transactional email | Resend | Through a Resend provider for Medusa's Notification module |
 | Sales tax | Stripe Tax, Tax Basic (pay-as-you-go) | Through a custom Medusa tax provider (section 26.2) |
 | Shipping labels | Shippo | By hand at MVP; from the admin in v1 |
 | File storage | Cloudflare R2 | Product photos, Rx uploads, measurement photos (v1) |
@@ -440,12 +466,6 @@ These close gaps in the stack. Each one is the smallest option that meets the re
 | Tests | Vitest for `packages/eyewear`; Medusa's own test tools (Jest-based) for the backend; Playwright for three checkout paths | Section 22.6 |
 | CI | GitHub Actions: lint, type-check and test on every pull request | Free for private repos within GitHub's included minutes |
 
-### Still to choose
-
-| Layer | Options | Needed by |
-| --- | --- | --- |
-| Transactional email | Resend or SendGrid (both through Medusa's Notification module) | Step 3 (non-Rx checkout sends the first order confirmation) |
-
 ### Deliberately left out
 
 | Tool | Why not now |
@@ -454,7 +474,7 @@ These close gaps in the stack. Each one is the smallest option that meets the re
 | Turborepo or Nx | pnpm workspaces alone handle three apps and one package |
 | XState or another state-machine library | The wizard has about 12 states; a reducer with a transition table covers it |
 | A separate Medusa worker instance | One Medusa instance in "shared" mode handles both API calls and background jobs at this volume. Split it if background jobs slow down the API |
-| Staging environment | v2. At MVP, the optician rehearses on production in Stripe test mode before live keys are turned on |
+| Staging environment | v1. At MVP, the optician rehearses on production in Stripe test mode before live keys are turned on |
 | Face-API.js / MindAR | The camera step only takes a photo. Nothing is measured in the browser |
 | TaxJar, EasyPost | Replaced by Stripe Tax and Shippo |
 
@@ -522,13 +542,14 @@ Prescriptions and face photos are sensitive health data.
 - Pushing to `main` deploys all three apps. Vercel and Railway each watch their own app folder.
 - Database migrations run automatically before the Medusa server starts on Railway.
 - The domain is still pending (open item). Until then, the default Vercel and Railway addresses are used.
+- The tablet app's login cookie only works once the domain exists. On the default addresses (`*.vercel.app` and `*.up.railway.app`), browsers treat it as a third-party cookie and block it. The domain is due Oct 9, before step 6.
 
 **Environment variables:**
 
 | App | Variables |
 | --- | --- |
-| Backend | `DATABASE_URL`, `REDIS_URL`, `STORE_CORS`, `ADMIN_CORS`, `AUTH_CORS`, `JWT_SECRET`, `COOKIE_SECRET`, `STRIPE_API_KEY`, `STRIPE_WEBHOOK_SECRET`, `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_PUBLIC_BUCKET`, `R2_PUBLIC_URL`, `R2_PRIVATE_BUCKET`, email provider key, `EMAIL_FROM`, `SUPPORT_EMAIL`; v1: `SHIPPO_API_KEY`, `SHIPPO_WEBHOOK_SECRET` |
-| Storefront | `MEDUSA_BACKEND_URL`, `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`, `NEXT_PUBLIC_STRIPE_KEY`, `NEXT_PUBLIC_BASE_URL` |
+| Backend | `DATABASE_URL`, `REDIS_URL`, `STORE_CORS`, `ADMIN_CORS`, `AUTH_CORS`, `JWT_SECRET`, `COOKIE_SECRET`, `STRIPE_API_KEY`, `STRIPE_WEBHOOK_SECRET`, `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_PUBLIC_BUCKET`, `R2_PUBLIC_URL`, `R2_PRIVATE_BUCKET`, `RESEND_API_KEY`, `EMAIL_FROM`, `SUPPORT_EMAIL`; v1: `SHIPPO_API_KEY`, `SHIPPO_WEBHOOK_SECRET` |
+| Storefront | `MEDUSA_BACKEND_URL`, `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`, `NEXT_PUBLIC_STRIPE_KEY`, `NEXT_PUBLIC_BASE_URL`, `NEXT_PUBLIC_DEFAULT_REGION` (`us`) |
 | Tablet app | `NEXT_PUBLIC_MEDUSA_BACKEND_URL` |
 
 ---
@@ -553,7 +574,7 @@ flowchart LR
     DF -->|card payments, refunds| ST[Stripe Payments]
     DF -->|California tax rates| TX[Stripe Tax]
     DF -->|photos, Rx files| R2[Cloudflare R2]
-    DF -->|order emails| EM[Email provider]
+    DF -->|order emails| EM[Resend]
     DF -.->|v1: labels, tracking| SH[Shippo]
     SH -.->|v1: delivered events| DF
     ST -->|payment webhooks| DF
@@ -588,7 +609,7 @@ flowchart TB
     MS -->|signed upload/view URLs| R2[(Cloudflare R2)]
     SF -->|direct upload| R2
     LA -->|direct view| R2
-    MS -->|notifications| EM[Email provider]
+    MS -->|notifications| EM[Resend]
 ```
 
 **How they interact:**
@@ -599,7 +620,7 @@ flowchart TB
 - **Tablet app → Medusa (Admin API):** reads the lab queue and moves jobs through statuses. Also puts orders on hold, enters seg heights, ships orders and issues refunds.
 - **Medusa → Stripe Tax:** calculates California tax on taxable lines, and records the transaction after the order is placed.
 - **Stripe → Medusa:** payment webhooks confirm payment state. Medusa verifies the signature first.
-- **Medusa → email provider:** sends order confirmation, On Hold and shipping emails from event subscribers.
+- **Medusa → Resend:** sends order confirmation, On Hold and shipping emails from event subscribers.
 
 ### 23.3 Key components (CRC cards)
 
@@ -671,7 +692,7 @@ donfiel/
 | Eyeglasses vs sunglasses | Not a variant. Stored on the pair's line items, since every frame can be either |
 | Standard / expedited shipping | Two flat-rate shipping options on the manual fulfillment provider. Transit days are stored on each option for the delivery estimate |
 
-**A pair in the cart and order** is one frame line plus (unless it's frame-only) one lens line. Both carry the same `pair_id` in their metadata. The lens line's metadata holds the pair's choices and Rx until the order is placed. At that point, the order-placed subscriber copies them into a lab job.
+**A pair in the cart and order** is one frame line plus (unless it's frame-only) one lens line. Both carry the same `pair_id` in their metadata. The frame line's metadata holds the pair's choices and Rx until the order is placed (the frame line exists for every pair, and Build Decisions Q3 puts the Rx there). At that point, the order-placed subscriber copies them into a lab job.
 
 ### 24.2 Database schema
 
@@ -738,7 +759,6 @@ erDiagram
         numeric seg_height_os
         text hold_reason
         jsonb hold_missing_fields
-        int lab_days
     }
     LAB_JOB_EVENT {
         text id PK
@@ -759,6 +779,7 @@ erDiagram
         text label
         text description
         numeric price
+        numeric price_multifocal
         int sort_order
         bool active
     }
@@ -810,7 +831,6 @@ Every custom table also has `created_at`, `updated_at` and `deleted_at`, which M
 | `needs_manual_estimation` | bool | True for progressive and bifocal jobs that opted out, and for all of them at MVP |
 | `seg_height_od`, `seg_height_os` | numeric, nullable | Entered by the optician, in mm. Recorded per eye; enter the same value twice if only one is measured |
 | `hold_reason`, `hold_missing_fields` | text, jsonb | Filled while On Hold |
-| `lab_days` | int | Lab time for this purpose (Part 1, section 11). Kept for the delivery estimate shown in order history |
 
 - Linked to `order` (one order → many lab jobs).
 - The Rx is stored as JSON on the job because it's a frozen copy that's read whole and edited rarely. Saved prescriptions use columns because customers edit them field by field.
@@ -825,14 +845,16 @@ Every custom table also has `created_at`, `updated_at` and `deleted_at`, which M
 | Column | Meaning |
 | --- | --- |
 | `code` | Stable identifier, for example `material_polycarbonate`, `finish_transition`, `transition_grey`, `coating_mirror_flash` |
-| `kind` | `material`, `finish`, `finish_option` or `coating` |
+| `kind` | `material`, `finish`, `finish_option`, `coating` or `coating_option` |
 | `parent_code` | For sub-options: the finish they belong to (for example, `transition_grey` → `finish_transition`) |
 | `frame_type` | `eyeglasses`, `sunglasses` or `both` |
-| `price` | Added to the lens price. Pending the client's price list (open item) |
+| `price` | Added to the lens price. For materials, this is the single vision / readers price |
+| `price_multifocal` | Materials only: the bifocal / progressive price |
 
 - Seeded by script from Part 1, section 7.
 - Price changes at MVP go through the seed script or a small Medusa Admin page.
-- If the client chooses prescription-strength pricing (open item, due Oct 2), one extra table of strength bands is added here. Only `calculateLensPrice()` in `packages/eyewear` changes.
+- Tint colors and mirror colors are `finish_option` and `coating_option` rows under their parent. Gold is a mirror color with its own +$20 price.
+- Prices are flat add-ons by lens type. No prescription-strength pricing is needed.
 
 **`warranty_claim`** (v1; `lab` module)
 
@@ -878,7 +900,7 @@ stateDiagram-v2
     [*] --> FrameType
     FrameType --> Purpose
     Purpose --> ReviewPair: frame only
-    Purpose --> Material: non-prescription
+    Purpose --> Finishes: non-prescription ($0 stock lens)
     Purpose --> Rx: single vision / readers / bifocal / progressive
     Rx --> ConfirmRx: valid Rx (manual, saved or upload + PD)
     ConfirmRx --> Rx: edit
@@ -965,7 +987,7 @@ stateDiagram-v2
 
 ### 26.1 Lens pricing and the add-pair workflow
 
-- `calculateLensPrice(selection, rx)` in `packages/eyewear` = material price + finish price + sub-option price + each coating's price. `rx` is passed in so strength-based pricing can be added without changing callers.
+- `calculateLensPrice(selection, purpose)` in `packages/eyewear` = material price for the purpose (`price` for single vision and readers, `price_multifocal` for bifocal and progressive, $0 stock lens for non-prescription) + finish price + each coating's price + any option price (Gold +$20).
 - **The storefront** shows the running price from `GET /store/lens-options`.
 - **The server** recalculates the price in the add-pair workflow and never trusts a price sent by the browser.
 - **The add-pair workflow:**
@@ -992,13 +1014,13 @@ A custom Medusa tax provider module, registered as the provider for the United S
 3. Call the Stripe Tax Calculation API with the address and the taxable lines. Amounts are sent in cents, with tax charged on top of the listed price.
 4. Return one tax line per taxable line item, using the rates Stripe returned. Save the calculation ID on the cart.
 
-- **Cost control:** Medusa recalculates tax whenever the cart changes. Each Stripe Tax transaction includes 10 calculation calls, and extra calls cost 5¢. The provider caches results in Redis for 30 minutes, keyed by address plus the taxable lines' IDs and amounts, so repeated recalculations don't call Stripe.
+- **Cost control:** Medusa recalculates tax whenever the cart changes. Each Stripe Tax transaction includes 10 calculation calls, and extra calls cost 5¢. Non-California carts never call Stripe, so at launch volume the extra calls cost cents per order. No cache at MVP; add one only if the Stripe Tax bill shows many extra calls.
 - **After the order is placed:** the order-placed subscriber creates a Stripe Tax transaction from the saved calculation, using the order number as the reference. This is what makes the order show in Stripe's tax reports for filing.
 - **Refunds:** each refund creates a matching tax transaction reversal (full or partial), so the California return stays correct.
 
 ### 26.3 Payment
 
-- Medusa's Stripe payment provider is configured with automatic capture (`capture: true`). Stripe Elements authorizes the card, and Medusa captures the full amount as soon as the order is created. The customer is charged in full at checkout, and never charged for an order that failed to be created.
+- Medusa's Stripe payment provider keeps its default manual capture. Stripe Elements only authorizes the card. The order-placed subscriber captures the full amount right after the order is created. The customer is charged in full at checkout, and never charged for an order that failed to be created. (With the provider's `capture: true`, Stripe would take the money when the card is confirmed, before the order exists.)
 - Refunds happen only through `POST /admin/lab/orders/:id/refund`. It runs Medusa's refund workflow (which calls Stripe's refund API), then the tax reversal, then logs a `lab_job_event`.
 - Stripe webhooks go to Medusa's built-in Stripe webhook route, which verifies the signature. This keeps payment status correct if the browser closes mid-payment.
 
@@ -1011,7 +1033,7 @@ flowchart LR
     A[Customer types Rx,<br/>picks saved Rx,<br/>or uploads file] --> B[Lens wizard<br/>validates with shared rules]
     B -->|upload| R2[(R2 private bucket)]
     B --> C[Add-pair workflow<br/>re-validates]
-    C --> D[Lens line metadata<br/>in the cart]
+    C --> D[Frame line metadata<br/>in the cart]
     D -->|order placed| E[lab_job.rx<br/>order's own copy]
     B -->|save to account| F[prescription row<br/>customer's copy]
     F -->|picked at checkout| B
@@ -1054,7 +1076,7 @@ flowchart LR
 | Order shipped | Ship workflow | Carrier and tracking number |
 | v1: Return approved | Return workflow | Return label |
 
-- Sent through Medusa's Notification module. The provider is still to choose.
+- Sent through Medusa's Notification module, with Resend as the provider.
 - The sending domain needs DKIM, SPF and DMARC records once the domain is bought.
 
 ### 26.8 Tablet app
@@ -1062,8 +1084,12 @@ flowchart LR
 - **Screens:** login; queue; job detail; order ship; refund.
     - **Queue** has tabs: New, Needs seg height, On Hold, In lab, Ready to ship.
     - **Job detail** shows the Rx in large type, the upload viewer, lens choices, the first-time progressive flag, seg height entry, status buttons and history.
-- **Tablet layout:** touch targets at least 48 px, Rx values at least 24 px. Navigation shows only the queue.
-- **Built for** a tablet in landscape and a desktop browser. _Which tablet it runs on is open, and affects testing._
+- **Responsive on every device:** designed for phone, tablet (portrait and landscape) and desktop.
+    - Phone: the queue shows as a single column of cards, with job actions in a bottom bar.
+    - Tablet: the queue and job detail sit side by side in landscape.
+    - Desktop: the same layout with more columns in the queue.
+- **On every size:** touch targets at least 48 px, Rx values at least 24 px, and navigation shows only the lab screens.
+- _Which tablet the optician uses is open, and affects testing. Playwright tests run at phone, tablet and desktop sizes._
 - **Idle logout** after 30 minutes (MVP). In v1: a warning 2 minutes before logout, a 4-digit PIN lock when the tablet wakes, and a warning before leaving a page with unsaved changes (for example, a half-entered seg height).
 
 ### 26.9 v1 additions
@@ -1192,12 +1218,13 @@ sequenceDiagram
     S-->>B: authorized
     B->>M: complete cart
     M->>M: re-check stock, acknowledgements
-    M->>S: capture full amount
     M-->>B: order
-    S-->>M: webhook (signed)
-    M->>M: order.placed → create lab jobs
+    M->>M: order.placed subscriber
+    M->>S: capture full amount
+    M->>M: create lab jobs
     M->>T: create tax transaction
     M->>M: send confirmation email
+    S-->>M: webhooks (signed): payment state
 ```
 
 - If completion fails after the card is authorized (for example, the last unit sold a moment earlier), Medusa's workflow rolls back and the authorization is canceled, so the customer isn't charged. They see an error on Order Review.
@@ -1209,10 +1236,10 @@ sequenceDiagram
 
 | Item | Needed by | Owner |
 | --- | --- | --- |
-| Email provider: Resend or SendGrid | Step 3 | Developer |
 | Transit days for standard and expedited shipping, and their prices | Step 3 | Client |
 | Daily order cutoff time, and whether holidays are skipped in delivery estimates | Step 3 | Client |
 | Allowed ranges for each Rx field (for example SPH −20.00 to +20.00 in 0.25 steps), and which fields readers need | Step 4 | Optician |
 | Whether seg height must be entered before lens work starts (25.2) | Step 6 | Optician |
 | Which tablet the optician will use | Step 6 | Client |
+| How much catalog work moves into the tablet app (Small, Medium or Full; Build Decisions recommends Small for the MVP), and whether to add a "Catalog & stock" button that opens Medusa Admin with the same login | Step 6 | Client |
 | Domain, then DNS for `donfiel.com`, `api.` and `lab.`, plus the email sending records | Oct 9 | Client, then developer |
